@@ -1,3 +1,4 @@
+import { BASE_API } from "@/consts/api.consts";
 import axios from "axios";
 
 export interface ILoginRequest {
@@ -6,8 +7,9 @@ export interface ILoginRequest {
 }
 
 export interface ILoginResponse {
-    token: string;
-    somedata: any;
+    userId: number;
+    role: 'USER' | 'ADMIN';
+    jwtToken: string;
 }
 
 export interface IRegitrationRequest {
@@ -21,11 +23,11 @@ export interface IRegitrationResponse {
 }
 
 export const login = async (request: ILoginRequest): Promise<ILoginResponse> => {
-    const {data} = await axios.post('http://localhost:3000/api/auth/login', request)
+    const {data} = await axios.post(`${BASE_API}/signin`, request)
     return data;
 }
 
 export const registration = async (request: IRegitrationRequest): Promise<IRegitrationResponse> => {
-    const {data} = await axios.post('http://localhost:3000/api/auth/registration', request)
+    const {data} = await axios.post(`${BASE_API}/signup`, request)
     return data;
 }

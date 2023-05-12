@@ -3,29 +3,31 @@
 import { registration } from "@/services/authApi";
 import { Box, Button, Container, TextField } from "@mui/material";
 import { useFormik } from "formik";
+import { useRouter } from "next/navigation";
 import * as Yup from "yup";
 
 export default function Page() {
 
+    const router = useRouter();
     
     const formik = useFormik({
         initialValues: {
             email: '',
-            firstname: '',
-            lastname: '',
+            name: '',
+            surname: '',
             password: '',
 
         },
         validationSchema: 
             Yup.object().shape({
-                firstname: Yup.string().required('Укажите имя'),
-                lastname: Yup.string().required('Укажите фамилию'),
+                name: Yup.string().required('Укажите имя'),
+                surname: Yup.string().required('Укажите фамилию'),
                 email: Yup.string().email('Укажите правильную почту').required('Укажите email'),
                 password: Yup.string().required('Укажите пароль')
             }),
         onSubmit: async values => {
-            const response = await registration(values);
-            sessionStorage.setItem('token', response.token);
+            await registration(values);
+            router.push('/login');
         }
     })
 
@@ -39,30 +41,30 @@ export default function Page() {
                     }}
                 >
                 <TextField
-                    value={formik.values.firstname}
+                    value={formik.values.name}
                     margin="normal"
                     required
                     fullWidth
-                    id="firstname"
+                    id="name"
                     label="First name"
-                    name="firstname"
-                    autoComplete="firstname"
+                    name="name"
+                    autoComplete="name"
                     onChange={formik.handleChange}
-                    helperText={formik.errors.firstname}
-                    error={formik.touched.firstname ? formik.errors.firstname !== undefined : false}
+                    helperText={formik.errors.name}
+                    error={formik.touched.name ? formik.errors.name !== undefined : false}
                 />
                 <TextField
-                    value={formik.values.lastname}
+                    value={formik.values.surname}
                     margin="normal"
                     required
                     fullWidth
-                    id="lastname"
+                    id="surname"
                     label="Last name"
-                    name="lastname"
-                    autoComplete="lastname"
+                    name="surname"
+                    autoComplete="surname"
                     onChange={formik.handleChange}
-                    helperText={formik.errors.lastname}
-                    error={formik.touched.lastname ? formik.errors.lastname !== undefined : false}
+                    helperText={formik.errors.surname}
+                    error={formik.touched.surname ? formik.errors.surname !== undefined : false}
                 />
                     <TextField
                         value={formik.values.email}

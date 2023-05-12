@@ -1,26 +1,32 @@
 'use client';
 
-import { getReserves } from "@/services/reservationApi"
+import { IReservation, deleteReserve, getReserves } from "@/services/reservationApi"
 
 import { Box, Card, CardContent, CardMedia, Container, IconButton, Pagination, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import DeleteIcon from '@mui/icons-material/Delete'
+import { CounterContext } from "@/context/counter.context";
 
 export default function Page() {
 
     const [page, setPage] = useState(1);
-    const [reserves, setReserves] = useState<any[]>([]);
-
+    const [reserves, setReserves] = useState<IReservation[]>([]);
+    const { state } = useContext(CounterContext);
+    
     const handleGetReserves = () => {
-        getReserves()
-            .then(res => setReserves(res))
-            .catch(err => console.error(err))
+        if (state?.userId !== null) {
+            getReserves(state?.userId)
+                .then(res => setReserves(res))
+                .catch(err => console.error(err))
+        }
     }
 
-    useEffect(() => handleGetReserves(), [])
+    useEffect(() => handleGetReserves(), [state?.userId])
 
-    const handleDelete = (id: string) => {
-        handleGetReserves();
+    const handleDelete = (reservationId: number, roomId: number) => {
+        deleteReserve(reservationId, roomId)
+            .then(() => handleGetReserves())
+            .catch(err => console.error(err))
     }
     
 
@@ -42,8 +48,12 @@ export default function Page() {
                                 № {r.id}
                                 </Typography>
 
-                                <IconButton edge="end" aria-label="delete" onClick={() => handleDelete(r.id)}>
-                                <DeleteIcon />
+                                <IconButton 
+                                    edge="end" 
+                                    aria-label="delete" 
+                                    onClick={() => handleDelete(r.id, r.period.roomId)}
+                                >
+                                    <DeleteIcon />
                                 </IconButton>
                             </Box>
                             <TableContainer>
@@ -64,7 +74,7 @@ export default function Page() {
                                 <TableCell component="th" scope="row">
                                     {(new Date()).toLocaleDateString('ru-RU')}
                                 </TableCell>
-                                <TableCell align="right">9:00-18:00</TableCell>
+                                <TableCell align="right">{r.period.startTime.toTimeString()} - {r.period.endTime.toTimeString()}</TableCell>
                                 <TableCell align="right">50</TableCell>
                                 <TableCell align="right">3</TableCell>
                                 <TableCell align="right">Adminka</TableCell>

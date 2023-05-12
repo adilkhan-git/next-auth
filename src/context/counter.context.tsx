@@ -1,27 +1,49 @@
 "use client";
 
+import { ILoginResponse } from "@/services/authApi";
 import React, { Dispatch, createContext, useReducer } from "react";
+import cookies from 'react-cookies';
 
 type StateType = {
-  count: number;
+  userId: number | null;
+  jwtToken: string | null;
 };
 
 type ActionType = {
   type: string;
+  payload: any;
 };
 
+const getUserData = (key: string) => {
+  const data = cookies.load(`${key}`);
+  if (data !== undefined) {
+    return data;
+  }
+  return null;
+}
+
 const initialState: StateType = {
-  count: 0,
+  userId: getUserData('userId'),
+  jwtToken: getUserData('jwtToken')
 };
+
+const SET_USER = 'SET_USER';
+
+export const handleSetUser = (payload: ILoginResponse) => ({
+  type: SET_USER,
+  payload
+})
 
 const reducer = (state: StateType, action: ActionType) => {
   switch (action.type) {
-    case "INCREMENT":
-      return { ...state, count: state.count + 1 };
-    case "DECREMENT":
-      return { ...state, count: state.count - 1 };
-    case "RESET":
-      return { ...state, count: 0 };
+    case SET_USER:
+      cookies.save('userId', action.payload.userId, {
+        maxAge: 3600*24,
+      })
+      cookies.save('jwtToken', action.payload.jwtToken, {
+        maxAge: 3600*24,
+      })
+      return { ...state, userId: action.payload.userId, jwtToken: action.payload.jwtToken }
     default:
       return state;
   }

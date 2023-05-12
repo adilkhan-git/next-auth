@@ -1,14 +1,17 @@
 "use client";
 
-import { CounterContext } from "@/context/counter.context";
+import { CounterContext, handleSetUser } from "@/context/counter.context";
 import { login } from "@/services/authApi";
 import { Box, Button, Container, TextField } from "@mui/material";
 import { useFormik } from "formik";
-import { useContext } from "react";
+import { useRouter } from "next/navigation";
+import { useContext, useEffect } from "react";
 import * as Yup from "yup";
 
 export default function Page() {
-  const { state, dispatch } = useContext(CounterContext);
+
+  const { dispatch } = useContext(CounterContext);  
+  const router = useRouter();
 
   const formik = useFormik({
     initialValues: {
@@ -23,7 +26,8 @@ export default function Page() {
     }),
     onSubmit: async (values) => {
       const response = await login(values);
-      sessionStorage.setItem("token", response.token);
+      dispatch(handleSetUser(response));
+      router.push('/cabinet/reservations');
     },
   });
 
